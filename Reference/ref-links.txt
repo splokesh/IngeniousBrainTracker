@@ -1,0 +1,13 @@
+This video link contains some advanced stuff, only begginning is important
+
+https://www.youtube.com/watch?v=IRaG5vkuJMA
+
+This website has code
+https://www.pantechsolutions.net/brain-computer-interface/matlab-code-to-read-attention-using-brainsense
+
+https://www.youtube.com/watch?v=1PX9d1QLtWA
+https://www.pantechsolutions.net/brain-computer-interface/matlab-code-to-read-eyeblink-using-mindwave-mobile
+
+Code That worked for me
+https://www.youtube.com/watch?v=8mdw7StdRUU
+https://www.pantechsolutions.net/sensors/brainwave-starter-kit-mindwave-mobile#product_tabs_videos

@@ -1,0 +1,99 @@
+
+function attention
+
+%%TG_DATA_ATTENTION = 2;
+%%Matlab code to read attention using Mindwave mobile
+%Clear Screen
+clc;
+%Clear Variables
+clear all;
+%Close figures
+close all;
+%Preallocate buffer
+data_att = zeros(1,256);
+%Comport Selection
+portnum1 = 6;
+%COM Port #
+comPortName1 = sprintf('\\\\.\\COM%d', portnum1);
+
+% Baud rate for use with TG_Connect() and TG_SetBaudrate().
+TG_BAUD_115200 = 115200;
+% Data format for use with TG_Connect() and TG_SetDataFormat().
+TG_STREAM_PACKETS = 0;
+% Data type that can be requested from TG_GetValue().
+TG_DATA_ATTENTION = 2;
+%load thinkgear dll
+loadlibrary('Thinkgear.dll');
+%To display in Command Window
+fprintf('Thinkgear.dll loaded\n');
+%get dll version
+dllVersion = calllib('Thinkgear', 'TG_GetDriverVersion');
+%To display in command window
+fprintf('ThinkGear DLL version: %d\n', dllVersion );
+% Get a connection ID handle to ThinkGear
+connectionId1 = calllib('Thinkgear', 'TG_GetNewConnectionId');
+patientID = 142314;
+if ( connectionId1 < 0 )
+error( sprintf( 'ERROR: TG_GetNewConnectionId() returned %d.\n', connectionId1 ) );
+end;
+
+             % Set/open stream (raw bytes) log file for connection
+errCode = calllib('Thinkgear', 'TG_SetStreamLog', connectionId1, 'streamLog.txt' );
+if( errCode < 0 )
+    error( sprintf( 'ERROR: TG_SetStreamLog() returned %d.\n', errCode ) );
+end;
+              % Set/open data (ThinkGear values) log file for connection
+errCode = calllib('Thinkgear', 'TG_SetDataLog', connectionId1, 'dataLog.txt' );
+
+if( errCode < 0 )
+    error( sprintf( 'ERROR: TG_SetDataLog() returned %d.\n', errCode ) );
+end;
+% Attempt to connect the connection ID handle to serial port "COM3"
+errCode = calllib('Thinkgear', 'TG_Connect', connectionId1,comPortName1,TG_BAUD_115200,TG_STREAM_PACKETS );
+if ( errCode < 0 )
+error( sprintf( 'ERROR: TG_Connect() returned %d.\n', errCode ) );
+end
+fprintf( 'Connected. Reading Packets...\n' );
+i=0;
+j=0;
+%To display in Command Window
+disp('Reading Brainwaves');
+fileID = fopen('Attention_data.txt','w');
+figure;
+while i < 40 % 20 must be there
+if (calllib('Thinkgear','TG_ReadPackets',connectionId1,1) == 1) %if a packet was read...
+if (calllib('Thinkgear','TG_GetValueStatus',connectionId1,TG_DATA_ATTENTION ) ~= 0)
+j = j + 1;
+i = i + 1;
+%Read attention Valus from thinkgear packets
+data_att(j) = calllib('Thinkgear','TG_GetValue',connectionId1,TG_DATA_ATTENTION );
+ad=data_att(j);
+fprintf(fileID,'%d\t %5d\n',patientID,ad);
+
+
+%To display in Command Window
+disp(data_att(j));
+
+
+%Plot Graph
+ax=subplot(1,1,1);
+plot([0 250],[75 75],'r');
+hold (ax,'on');
+plot(ax,data_att);
+
+%hline = refline([0 75]);
+%hline.Color = 'r';
+title('Attention');
+%Delay to display graph
+pause(1);
+end
+end
+end
+%To display in Command Window
+disp('Loop Completed');
+fclose(fileID);
+%Release the comm port
+calllib('Thinkgear', 'TG_FreeConnection', connectionId1 );
+
+end
+
